@@ -2,23 +2,15 @@
 Note: docker-compose doesn't work well yet, use the scripts below instead
 
 ```bash
-# create necessary volumes
-# only need to run this once
-./init.sh
-```
-
-```bash
+sudo yum install epel-release
+sudo yum install certbot
+# substitute the correct subdomain(s).domain(s)
+certbot certonly --standalone -d azure1.tradle.io
 # run nginx proxy + letsencrypt
-./proxy.sh
-```
-
-```bash
-# run tradle-server
 ./start.sh
-```
 
-DEPRECATED:
-
-```
-docker network create -d bridge nginx-proxy
+# setup auto-renew
+sudo nano /etc/crontab
+# paste:
+# @monthly /path/to/renew.sh
 ```
