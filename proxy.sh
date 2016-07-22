@@ -28,6 +28,6 @@ docker run -d \
     --name letsencrypt \
     -e "NGINX_DOCKER_GEN_CONTAINER=nginx-gen" \
     --volumes-from nginx \
-    -v $(pwd)/../../volumes/proxy/certs:/etc/nginx/certs:rw \
+    -v "/etc/letsencrypt/${TRADLE_SERVER_URL}":/etc/nginx/certs:rw \
     -v /var/run/docker.sock:/var/run/docker.sock:ro \
     jrcs/letsencrypt-nginx-proxy-companion
