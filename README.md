@@ -5,8 +5,8 @@ Note: docker-compose doesn't work well yet, use the scripts below instead
 sudo yum install epel-release
 sudo yum install certbot
 # substitute the correct subdomain(s).domain(s)
-certbot certonly --standalone -d azure1.tradle.io
-# run nginx proxy + letsencrypt
+sudo certbot certonly --standalone -d azure1.tradle.io
+# run nginx proxy
 ./start.sh
 
 # setup auto-renew
