@@ -23,14 +23,14 @@ docker run -d \
     -notify-sighup nginx -watch -only-exposed -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
 
 
-echo "Starting letsencrypt-nginx-proxy-companion..."
-docker run -d \
-    --name letsencrypt \
-    -e "NGINX_DOCKER_GEN_CONTAINER=nginx-gen" \
-    --volumes-from nginx \
-    -v /var/proxy/certs:/etc/nginx/certs:rw \
-    -v /var/run/docker.sock:/var/run/docker.sock:ro \
-    jrcs/letsencrypt-nginx-proxy-companion
+#echo "Starting letsencrypt-nginx-proxy-companion..."
+#docker run -d \
+#    --name letsencrypt \
+#    -e "NGINX_DOCKER_GEN_CONTAINER=nginx-gen" \
+#    --volumes-from nginx \
+#    -v /var/proxy/certs:/etc/nginx/certs:rw \
+#    -v /var/run/docker.sock:/var/run/docker.sock:ro \
+#    jrcs/letsencrypt-nginx-proxy-companion
 
 echo "Starting tradle server"
 docker run -id \
