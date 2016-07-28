@@ -7,7 +7,6 @@ services:
 # START adapted from: https://github.com/fatk/docker-letsencrypt-nginx-proxy-companion-examples/blob/master/docker-compose/v2/simple-site/docker-compose.yml
   nginx:
     image: nginx
-    container_name: nginx
     ports:
       - "80:80"
       - "443:443"
@@ -20,7 +19,6 @@ services:
       - proxy-tier
   nginx-gen:
     image: jwilder/docker-gen
-    container_name: nginx-gen
     volumes:
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
       - "./nginx-compose-v2.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro"
