@@ -53,11 +53,17 @@ services:
 # END adapted from https://bitbucket.org/as-docker/pushd/src
   tradle-push:
     image: tradle/push-server
+    build:
+      context: .
+      args:
+        db: "./push.db"
+        port: "80"
+        pushd_port: 24432
     ports:
       - "80"
       - "443"
     environment:
-      - PUSHD_TCP_PORT=24432
+      # - PUSHD_PORT=24432
       - VIRTUAL_HOST=push.tradle.io
       - VIRTUAL_NETWORK=nginx-proxy
       - VIRTUAL_PORT=80
