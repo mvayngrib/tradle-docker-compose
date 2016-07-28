@@ -38,7 +38,7 @@ services:
     environment:
       - REDIS_PORT=6379
       - REDIS_HOST=redis
-      - VIRTUAL_PORT=24432
+      - VIRTUAL_PORT=${PUSHD_PORT}
       # - REDIS_PASSWORD="..."
       - GCM_KEY="${GCM_KEY}"
       - APNS_CERT="/opt/apns/apns-cert.pem"
@@ -53,15 +53,6 @@ services:
 # END adapted from https://bitbucket.org/as-docker/pushd/src
   tradle-push:
     image: tradle/push-server
-    build:
-      context: .
-      args:
-        db: "./push.db"
-        port: "80"
-        pushd_port: 24432
-    ports:
-      - "80"
-      - "443"
     environment:
       # - PUSHD_PORT=24432
       - VIRTUAL_HOST=push.tradle.io
@@ -71,3 +62,6 @@ services:
       - LETSENCRYPT_EMAIL=mark@tradle.io
     networks:
       - proxy-tier
+    expose:
+      - "80"
+    entrypoint: ./cmd.js --db ./push.db --pushd ${PUSHD_PORT} --port 80

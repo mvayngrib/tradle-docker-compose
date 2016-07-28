@@ -1,3 +1,4 @@
 TRADLE_SERVER_URL=push.tradle.io
 DEV_EMAIL=mark@tradle.io
+PUSHD_PORT=24432
 GCM_KEY=abcdefghijklmnop
