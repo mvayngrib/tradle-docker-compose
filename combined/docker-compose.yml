@@ -16,7 +16,7 @@ services:
       - "/etc/nginx/conf.d"
       - "/etc/nginx/vhost.d"
       - "/usr/share/nginx/html"
-      - "${SSL_CERTS_DIR}:/etc/nginx/certs:ro"
+      - "/var/proxy/certs:/etc/nginx/certs:ro"
   nginx-gen:
     image: jwilder/docker-gen
     container_name: nginx-gen
