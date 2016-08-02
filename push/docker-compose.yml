@@ -1,65 +1,42 @@
 version: '2'
 networks:
-  proxy-tier:
-    external:
-      name: nginx-proxy
-services:
-# START adapted from: https://github.com/fatk/docker-letsencrypt-nginx-proxy-companion-examples/blob/master/docker-compose/v2/simple-site/docker-compose.yml
-  nginx:
-    image: nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - "/etc/nginx/conf.d"
-      - "/etc/nginx/vhost.d"
-      - "/usr/share/nginx/html"
-      - "/var/proxy/certs:/etc/nginx/certs:ro"
-    networks:
-      - proxy-tier
-  nginx-gen:
-    image: jwilder/docker-gen
-    volumes:
-      - "/var/run/docker.sock:/tmp/docker.sock:ro"
-      - "./nginx-compose-v2.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro"
-    volumes_from:
-      - nginx
-    entrypoint: /usr/local/bin/docker-gen -notify-sighup nginx -watch -only-exposed -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
-# END adapted from: https://github.com/fatk/docker-letsencrypt-nginx-proxy-companion-examples/blob/master/docker-compose/v2/simple-site/docker-compose.yml
+  front:
+  back:
+volumes:
+  pushdb:
 
-# START adapted from https://bitbucket.org/as-docker/pushd/src
+services:
+  redis:
+    image: redis
+    ports:
+      - 6379
+    networks:
+      - back
   pushd:
     image: amsdard/pushd:latest
     volumes:
       - ./settings:/opt/settings
-      - ./apns:/opt/apns
+    ports:
+      - 8081
     environment:
       - REDIS_PORT=6379
       - REDIS_HOST=redis
-      - VIRTUAL_PORT=${PUSHD_PORT}
       # - REDIS_PASSWORD="..."
-      - GCM_KEY="${GCM_KEY}"
-      - APNS_CERT="/opt/apns/apns-cert.pem"
-      - APNS_KEY="/opt/apns/apns-key.pem"
+      - GCM_KEY=${GCM_KEY}
+      - APNS_CERT=/opt/settings/apns-cert.pem
+      - APNS_KEY=/opt/settings/apns-key.pem
       - PUSHD_LOGGING_LEVEL=silly
     networks:
-      - proxy-tier
-  redis:
-    image: redis
-    ports:
-      - "6379"
-# END adapted from https://bitbucket.org/as-docker/pushd/src
+      - back
   tradle-push:
     image: tradle/push-server
-    environment:
-      # - PUSHD_PORT=24432
-      - VIRTUAL_HOST=push.tradle.io
-      - VIRTUAL_NETWORK=nginx-proxy
-      - VIRTUAL_PORT=80
-      - LETSENCRYPT_HOST=push.tradle.io
-      - LETSENCRYPT_EMAIL=mark@tradle.io
+    ports:
+      - "80:80"
     networks:
-      - proxy-tier
-    expose:
-      - "80"
-    entrypoint: ./cmd.js --db ./push.db --pushd ${PUSHD_PORT} --port 80
+      - front
+      - back
+    volumes:
+      - pushdb:/opt/app/storage
+#    environment:
+#     - DEBUG=*
+    entrypoint: node /opt/app/run.js --db /opt/app/storage/push.db --pushd http://pushd:8081 --port 80
