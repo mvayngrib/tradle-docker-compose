@@ -1,0 +1,81 @@
+version: '2'
+volumes:
+  pushdb:
+  server-conf:
+    external: true
+  server-storage:
+    external: true
+services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/etc/nginx/conf.d"
+      - "/etc/nginx/vhost.d"
+      - "/usr/share/nginx/html"
+      - "${SSL_CERTS_DIR}:/etc/nginx/certs:ro"
+  nginx-gen:
+    image: jwilder/docker-gen
+    container_name: nginx-gen
+    volumes_from:
+      - nginx
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./:/etc/docker-gen/templates
+    entrypoint: /usr/local/bin/docker-gen -notify-sighup nginx -watch /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
+  redis:
+    image: redis
+    ports:
+      - 6379
+    environment:
+      - VIRTUAL_HOST=redis
+      - VIRTUAL_PORT=6379
+  pushd:
+    image: amsdard/pushd:latest
+    volumes:
+      - ./settings:/opt/settings
+    ports:
+      - 8081
+    environment:
+      - REDIS_PORT=6379
+      - REDIS_HOST=redis
+      # - REDIS_PASSWORD="..."
+      - GCM_KEY=${GCM_KEY}
+      - APNS_CERT=/opt/settings/apns-cert.pem
+      - APNS_KEY=/opt/settings/apns-key.pem
+      - PUSHD_LOGGING_LEVEL=silly
+      - VIRTUAL_HOST=pushd
+      - VIRTUAL_PORT=8081
+  tradle-push:
+    image: tradle/push-server
+    ports:
+      - 80
+    volumes:
+      - pushdb:/opt/app/storage
+    environment:
+      - VIRTUAL_HOST=${TRADLE_PUSH_URL}
+    entrypoint: node /opt/app/run.js --db /opt/app/storage/push1.db --pushd http://pushd:8081 --port 80
+  tradle:
+    image: tradle/server-cli:v2
+    container_name: tradle-server
+    restart: always
+    environment:
+      - VIRTUAL_HOST=${TRADLE_SERVER_URL}
+      - VIRTUAL_PORT=80
+      - NODE_ENV=development
+      - AUTORUN=1
+      - DEBUG=tradle:*
+      - HOME=/home
+      - CONF_PATH=./conf
+      - STORAGE_PATH=./storage
+      - TRADLE_SERVER_PORT=80
+    volumes:
+      - server-conf:/opt/app/conf
+      - server-storage:/opt/app/storage
+    ports:
+      - "80"
+    tty: true
+    stdin_open: true
