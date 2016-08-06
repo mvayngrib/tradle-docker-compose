@@ -1,6 +1,9 @@
 version: '2'
 volumes:
   pushdb:
+    external: true
+  ghostdb:
+    external: true
   server-conf:
     external: true
   server-storage:
@@ -79,3 +82,21 @@ services:
       - "80"
     tty: true
     stdin_open: true
+  ghost:
+    image: ghost
+    volumes:
+      - ghostdb:/var/lib/ghost
+    ports:
+      - 2368
+    environment:
+      - VIRTUAL_HOST=${TRADLE_BLOG_URL}
+      - VIRTUAL_PORT=2368
+ 
+#  nodebb:
+#    image: nodebb/docker:centos
+#    ports:
+#      - 4567
+#    environment
+#      - VIRTUAL_HOST=forum.tradle.io
+#      - VIRTUAL_PORT=80
+
