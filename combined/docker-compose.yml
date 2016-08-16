@@ -86,17 +86,11 @@ services:
     image: ghost
     volumes:
       - ghostdb:/var/lib/ghost
-    ports:
-      - 2368
     environment:
       - VIRTUAL_HOST=${TRADLE_BLOG_URL}
       - VIRTUAL_PORT=2368
- 
-#  nodebb:
+#  forum:
 #    image: nodebb/docker:centos
-#    ports:
-#      - 4567
-#    environment
-#      - VIRTUAL_HOST=forum.tradle.io
-#      - VIRTUAL_PORT=80
-
+#    environment:
+#      - VIRTUAL_HOST=${TRADLE_FORUM_URL}
+#      - VIRTUAL_PORT=4567
