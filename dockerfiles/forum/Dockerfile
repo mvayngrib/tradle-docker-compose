@@ -11,7 +11,7 @@ RUN yum -y install openssl openssl-devel
 
 # clone nodebb and install it
 RUN cd /opt ; git clone -b v1.x.x https://github.com/NodeBB/NodeBB nodebb
-RUN cd /opt/nodebb ; npm install
+RUN cd /opt/nodebb ; npm install && npm install --save mongodb@2.1.21
 
 # Create a nodebb volume
 VOLUME /opt/nodebb
