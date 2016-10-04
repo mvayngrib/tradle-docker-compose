@@ -16,6 +16,8 @@ services:
       - "/etc/nginx/vhost.d"
       - "/usr/share/nginx/html"
       - "/var/proxy/certs:/etc/nginx/certs:ro"
+# depends on ssl certs setup
+#     - "/etc/letsencrypt/live/${TRADLE_HOST}:/etc/letsencrypt/live/${TRADLE_HOST}"
   nginx-gen:
     image: jwilder/docker-gen
     container_name: nginx-gen
@@ -30,7 +32,7 @@ services:
     container_name: tradle-server
     restart: always
     environment:
-      - VIRTUAL_HOST=${TRADLE_SERVER_URL}
+      - VIRTUAL_HOST=${TRADLE_HOST}
       - VIRTUAL_PORT=80
       - NODE_ENV=development
       - AUTORUN=1
