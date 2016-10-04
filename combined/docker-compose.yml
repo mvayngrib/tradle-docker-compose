@@ -37,7 +37,7 @@ services:
       - VIRTUAL_HOST=redis
       - VIRTUAL_PORT=6379
   pushd:
-    image: amsdard/pushd:latest
+    image: tradle/pushd:latest
     volumes:
       - ./settings:/opt/settings
     ports:
@@ -53,7 +53,7 @@ services:
       - VIRTUAL_HOST=pushd
       - VIRTUAL_PORT=8081
   tradle-push:
-    image: tradle/push-server
+    image: tradle/push-server:dev
     ports:
       - 80
     volumes:
@@ -89,6 +89,16 @@ services:
     environment:
       - VIRTUAL_HOST=${TRADLE_BLOG_URL}
       - VIRTUAL_PORT=2368
+#  static:
+#    image: static-server
+#    restart: always
+#    volumes:
+#      - ./public:/public
+#    environment:
+#      - VIRTUAL_HOST=files.tradle.io
+#      - VIRTUAL_PORT=9080
+#    entrypoint: static-server /public
+
 #  forum:
 #    image: nodebb/docker:centos
 #    environment:
