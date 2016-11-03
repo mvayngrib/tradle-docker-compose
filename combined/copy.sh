@@ -2,25 +2,26 @@
 
 printUsage() 
 {
-  echo "./copy.sh SOURCE_DIR DEST_DIR"
+  echo "./copy.sh HOST SOURCE_DIR DEST_DIR"
 }
 
-if [ -f .env ]; then
-  source ./.env
-fi
-
-if [ -z $HOST ]; then 
-  echo "set HOST environment variable";
+if [ "$#" -ne 3 ]; then
+  printUsage;
   exit 1;
 fi
 
-if [ ! -d "$1" ]; then 
+HOST="$1"
+SOURCE_DIR="$2"
+DEST_DIR="$3"
+
+if [ ! -d "$SOURCE_DIR" ]; then
   printUsage;
+  exit 1;
 fi
 
-KEY="$1/privkey.pem"
-CERT="$1/fullchain.pem"
-DH="$1/dhparam.pem"
+KEY="$SOURCE_DIR/privkey.pem"
+CERT="$SOURCE_DIR/fullchain.pem"
+DH="$SOURCE_DIR/dhparam.pem"
 
 if [ ! -L "$KEY" ]; then 
   if [ ! -f "$KEY" ]; then
@@ -43,8 +44,8 @@ if [ ! -L "$DH" ]; then
   fi
 fi
 
-mkdir -p $2
+mkdir -p "$DEST_DIR"
 
-cp "$KEY" "$2/$HOST.key"
-cp "$CERT" "$2/$HOST.crt"
-cp "$DH" "$2/$HOST.dhparam.pem"
+cp "$KEY" "$DEST_DIR/$HOST.key"
+cp "$CERT" "$DEST_DIR/$HOST.crt"
+cp "$DH" "$DEST_DIR/$HOST.dhparam.pem"
